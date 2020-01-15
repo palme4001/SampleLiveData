@@ -11,7 +11,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModelMain: ViewModelMain
-    private var countNonViewModel = 0
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
         // Observe view model count changes and update textview
         viewModelMain.count.observe(this, Observer {
-            tvCountViewModel.text = "ViewModel value: $it"
+            tvCountViewModel.text = "Value: $it"
         })
 
         bnAddCount.setOnClickListener {
@@ -32,15 +31,19 @@ class MainActivity : AppCompatActivity() {
             viewModelMain.count.postValue(
                 viewModelMain.count.value?.plus(1)
             )
-
-            // Update the activity based count value
-            countNonViewModel++
-            tvCountNonViewModel.text = "Activity value: $countNonViewModel"
         }
 
-        //transformationMap()
-        //transformationSwitchMap()
+        // Testing Transformations.map()
+        transformationMap()
+
+        // Testing Transformations.switchMap()
+        transformationSwitchMap()
+
+        // Testing Transformations.distinctUntilChanged()
         distinctUntilChanged()
+
+        // Testing MediatorLiveData
+        mediatorLiveData()
     }
 
     private fun transformationMap(){
@@ -54,6 +57,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("LIVE_DATA", "Source Value: $sourceValue")
         })
 
+        // This change will trigger the Observers of 'source' and 'mapped'
         viewModelMain.source.postValue("New Source")
     }
 
@@ -74,6 +78,10 @@ class MainActivity : AppCompatActivity() {
             Log.d("LIVE_DATA", "Switch Mapped Value: $mappedValue")
         })
 
+        // This will trigger all 3 LiveData Observers of:
+        // source1
+        //   -> switchMapped
+        //      -> switchMappedLvl2
         viewModelMain.source1.postValue("New Source1")
     }
 
@@ -89,6 +97,23 @@ class MainActivity : AppCompatActivity() {
             Log.d("LIVE_DATA", "Distinct Value: $distinctValue")
         })
 
+        // This will not trigger the Observer's of distinctSource2
+        viewModelMain.source2.postValue("Initial Source2")
+
+        // But this will ..
         viewModelMain.source2.postValue("Initial Source2 - New")
+    }
+
+    private fun mediatorLiveData() {
+
+        viewModelMain.mediator.observe(this, Observer { mediatorValue ->
+            Log.d("LIVE_DATA", "Mediator value: $mediatorValue")
+        })
+
+        // This will trigger the mediator LiveData object Observers
+        viewModelMain.sourceMediator1.postValue("Mediator Source 1 - New")
+
+        // Its also possible to directly change the value of the mediator Live Data
+        viewModelMain.mediator.postValue("New Mediator Value")
     }
 }

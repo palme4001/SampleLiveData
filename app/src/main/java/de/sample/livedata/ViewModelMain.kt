@@ -1,14 +1,13 @@
 package de.sample.livedata
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 
 class ViewModelMain(application: Application): AndroidViewModel(application) {
 
+    // This value of the LiveData object will survive any configuration changes
+    // (Activity restarts)
     val count = MutableLiveData(0)
-
 
     /**
      *  Live Data Transformations
@@ -50,4 +49,17 @@ class ViewModelMain(application: Application): AndroidViewModel(application) {
     // to it's old value)
     // If source value is given the exact same value as before, the new LiveData object will not be triggered
     val distinctSource2 = Transformations.distinctUntilChanged(source2)
+
+
+    val sourceMediator1 = MutableLiveData<String>("Mediator Source 1")
+    val sourceMediator2 = MutableLiveData<String>("Mediator Source 2")
+
+    val mediator = MediatorLiveData<String>().also { mediatorLiveData ->
+        mediatorLiveData.addSource(sourceMediator1) { sourceMediator1Value ->
+            mediatorLiveData.value = sourceMediator1Value
+        }
+        mediatorLiveData.addSource(sourceMediator2) {sourceMediator2Value ->
+            mediatorLiveData.value = sourceMediator2Value
+        }
+    }
 }
