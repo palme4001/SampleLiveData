@@ -51,6 +51,10 @@ class ViewModelMain(application: Application): AndroidViewModel(application) {
     val distinctSource2 = Transformations.distinctUntilChanged(source2)
 
 
+    /*
+        MediatorLiveData
+        reacts to changes from multiple sources
+     */
     val sourceMediator1 = MutableLiveData<String>("Mediator Source 1")
     val sourceMediator2 = MutableLiveData<String>("Mediator Source 2")
 
